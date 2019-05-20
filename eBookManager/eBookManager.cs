@@ -33,9 +33,9 @@ namespace eBookManager
             lstStorageSpaces.Clear();
             if (!(spaces == null))
             {
-                foreach (StorageSpace space in spaces)
+                foreach (var space in spaces)
                 {
-                    ListViewItem lvItem = new ListViewItem(space.Name, 0);
+                    var lvItem = new ListViewItem(space.Name, 0);
                     lvItem.Tag = space.BookList;
                     lvItem.Name = space.ID.ToString();
                     lstStorageSpaces.Items.Add(lvItem);
@@ -50,16 +50,16 @@ namespace eBookManager
 
             if (ebookList != null)
             {
-                foreach (Document eBook in ebookList)
+                foreach (var eBook in ebookList)
                 {
-                    ListViewItem book = new ListViewItem(eBook.Title, 1);
+                    var book = new ListViewItem(eBook.Title, 1);
                     book.Tag = eBook;
                     lstBooks.Items.Add(book);
                 }
             }
             else
             {
-                ListViewItem book = new ListViewItem("This storage space contains no eBooks", 2);
+                var book = new ListViewItem("This storage space contains no eBooks", 2);
                 book.Tag = "";
                 lstBooks.Items.Add(book);
             }
@@ -86,7 +86,7 @@ namespace eBookManager
 
         private void mnuImportEbooks_Click(object sender, EventArgs e)
         {
-            ImportBooks import = new ImportBooks();
+            var import = new ImportBooks();
             import.ShowDialog();
             spaces = spaces.ReadFromDataStore(_jsonPath);
             PopulateStorageSpaceList();
@@ -94,23 +94,23 @@ namespace eBookManager
 
         private void lstStorageSpaces_MouseClick(object sender, MouseEventArgs e)
         {
-            ListViewItem selectedStorageSpace = lstStorageSpaces.SelectedItems[0];
-            int spaceID = selectedStorageSpace.Name.ToInt();
+            var selectedStorageSpace = lstStorageSpaces.SelectedItems[0];
+            var spaceID = selectedStorageSpace.Name.ToInt();
 
             txtStorageSpaceDescription.Text = (from d in spaces
                                                where d.ID == spaceID
                                                select d.Description).First();
 
-            List<Document> ebookList = (List<Document>)selectedStorageSpace.Tag;
+            var ebookList = (List<Document>)selectedStorageSpace.Tag;
             PopulateContainedEbooks(ebookList);
         }
 
         private void lstBooks_MouseClick(object sender, MouseEventArgs e)
         {
-            ListViewItem selectedBook = lstBooks.SelectedItems[0];
+            var selectedBook = lstBooks.SelectedItems[0];
             if (!String.IsNullOrEmpty(selectedBook.Tag.ToString()))
             {
-                Document ebook = (Document)selectedBook.Tag;
+                var ebook = (Document)selectedBook.Tag;
                 txtFileName.Text = ebook.FileName;
                 txtExtension.Text = ebook.Extension;
                 dtLastAccessed.Value = ebook.LastAccessed;
@@ -129,11 +129,18 @@ namespace eBookManager
 
         private void btnReadEbook_Click(object sender, EventArgs e)
         {
-            string filePath = txtFilePath.Text;
-            FileInfo fi = new FileInfo(filePath);
-            if (fi.Exists)
+            var filePath = txtFilePath.Text;
+            if (!(String.IsNullOrWhiteSpace(filePath)))
             {
-                Process.Start(Path.GetDirectoryName(filePath));
+                var fi = new FileInfo(filePath);
+                if (fi.Exists)
+                {
+                    _ = Process.Start(Path.GetDirectoryName(filePath));
+                }
+            }
+            else
+            {
+                _ = MessageBox.Show("Please select a file");
             }
         }
     }
